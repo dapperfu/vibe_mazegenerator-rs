@@ -19,6 +19,7 @@ impl Cell {
     }
 
     /// Check if a cell has all walls (completely isolated)
+    #[allow(dead_code)]
     pub fn is_isolated(&self) -> bool {
         self.north && self.south && self.east && self.west
     }
@@ -72,6 +73,7 @@ impl Maze {
     }
 
     /// Get a mutable reference to a cell at (x, y)
+    #[allow(dead_code)]
     pub fn get_cell_mut(&mut self, x: u32, y: u32) -> Option<&mut Cell> {
         if x < self.width && y < self.height {
             Some(&mut self.cells[y as usize][x as usize])
@@ -117,6 +119,7 @@ impl Maze {
     }
 
     /// Check if there's a wall between two adjacent cells
+    #[allow(dead_code)]
     pub fn has_wall(&self, x1: u32, y1: u32, x2: u32, y2: u32) -> bool {
         if x1 >= self.width || y1 >= self.height || x2 >= self.width || y2 >= self.height {
             return true;
