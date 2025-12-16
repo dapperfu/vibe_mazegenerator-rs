@@ -1,0 +1,8 @@
+width = 50
+height = 50
+algorithm = "recursive_backtracking"
+complexity = 0.5
+output = ".img/maze.png"
+cell_size = 2
+seed = 12345
+

@@ -5,4 +5,6 @@ complexity = 0.5
 output = ".img/maze.png"
 cell_size = 10
 # seed = 12345  # Uncomment and set a value for reproducible mazes
+# line_color = "#ff0000"  # Solution line color (hex code, with or without #)
+# line_thickness = 0.33  # Solution line thickness ratio (0.0 = invisible, 1.0 = full width, default = 0.33)
 

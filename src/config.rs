@@ -65,7 +65,7 @@ pub struct Config {
     pub cell_size: u32,
     pub seed: Option<u64>,
     pub solution_line_color: String,
-    pub solution_line_thickness: Option<f32>,
+    pub solution_line_thickness: f32,
 }
 
 impl Default for Config {
@@ -79,7 +79,7 @@ impl Default for Config {
             cell_size: 10,
             seed: None,
             solution_line_color: "#ff0000".to_string(),
-            solution_line_thickness: None,
+            solution_line_thickness: 0.33,
         }
     }
 }
@@ -134,10 +134,11 @@ impl Config {
         }
 
         if let Some(line_thickness) = parsed.get("line_thickness").and_then(|v| v.as_float()) {
-            if line_thickness > 0.0 {
-                config.solution_line_thickness = Some(line_thickness as f32);
+            let thickness = line_thickness as f32;
+            if thickness >= 0.0 && thickness <= 1.0 {
+                config.solution_line_thickness = thickness;
             } else {
-                return Err("line_thickness must be greater than 0".to_string());
+                return Err("line_thickness must be between 0.0 and 1.0".to_string());
             }
         }
 
@@ -200,8 +201,8 @@ impl Config {
             }
         }
         if let Some(lt) = line_thickness {
-            if lt > 0.0 {
-                self.solution_line_thickness = Some(lt);
+            if lt >= 0.0 && lt <= 1.0 {
+                self.solution_line_thickness = lt;
             }
         }
         self

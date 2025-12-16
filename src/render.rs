@@ -1,6 +1,30 @@
-use crate::config::parse_hex_color;
 use crate::maze::Maze;
 use image::{ImageBuffer, Rgb, RgbImage};
+
+/// Parse a hex color string to RGB values
+/// Accepts formats: "#ff0000", "ff0000", "#FF0000", "FF0000"
+/// Returns (r, g, b) as u8 values
+fn parse_hex_color(hex: &str) -> Result<[u8; 3], String> {
+    let hex = hex.trim();
+    let hex = if hex.starts_with('#') {
+        &hex[1..]
+    } else {
+        hex
+    };
+
+    if hex.len() != 6 {
+        return Err(format!("Hex color must be 6 digits, got: {}", hex));
+    }
+
+    let r = u8::from_str_radix(&hex[0..2], 16)
+        .map_err(|e| format!("Invalid hex color (R): {}", e))?;
+    let g = u8::from_str_radix(&hex[2..4], 16)
+        .map_err(|e| format!("Invalid hex color (G): {}", e))?;
+    let b = u8::from_str_radix(&hex[4..6], 16)
+        .map_err(|e| format!("Invalid hex color (B): {}", e))?;
+
+    Ok([r, g, b])
+}
 
 /// Render a maze to a PNG image
 pub fn render_maze(maze: &Maze, cell_size: u32) -> Result<RgbImage, String> {
@@ -162,7 +186,7 @@ pub fn render_maze_with_solution(
     cell_size: u32,
     solution: &[(u32, u32)],
     line_color: &str,
-    line_thickness: Option<f32>,
+    line_thickness: f32,
 ) -> Result<RgbImage, String> {
     let mut img = render_maze(maze, cell_size)?;
 
@@ -174,8 +198,9 @@ pub fn render_maze_with_solution(
     let rgb = parse_hex_color(line_color)?;
     let color = Rgb([rgb[0], rgb[1], rgb[2]]);
 
-    // Calculate line thickness (default: 1/3 of cell_size)
-    let thickness = line_thickness.unwrap_or_else(|| cell_size as f32 / 3.0);
+    // Calculate line thickness: ratio (0-1) multiplied by cell_size
+    // 0.0 = invisible, 1.0 = full width of hallway
+    let thickness = line_thickness * cell_size as f32;
 
     // Convert solution cell coordinates to pixel coordinates (center of each cell)
     let pixel_coords: Vec<(i32, i32)> = solution
@@ -212,7 +237,7 @@ pub fn save_maze_with_solution(
     solution: &[(u32, u32)],
     output_path: &str,
     line_color: &str,
-    line_thickness: Option<f32>,
+    line_thickness: f32,
 ) -> Result<(), String> {
     let img = render_maze_with_solution(maze, cell_size, solution, line_color, line_thickness)?;
     img.save(output_path)

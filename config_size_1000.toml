@@ -1,0 +1,8 @@
+width = 50
+height = 50
+algorithm = "recursive_backtracking"
+complexity = 0.5
+output = ".img/size_example_1000x1000.png"
+cell_size = 20
+seed = 12345
+

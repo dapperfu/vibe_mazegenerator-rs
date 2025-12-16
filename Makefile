@@ -10,7 +10,9 @@ IMG_DIR := .img
 MAZE_PNG := ${IMG_DIR}/maze.png
 MAZE_SOLVED_PNG := ${IMG_DIR}/maze_solved.png
 
-.PHONY: release debug clean maze all-algorithms all-mazes benchmark help images regenerate-images regenerate-images-push
+.PHONY: release debug clean maze all-algorithms all-mazes benchmark help images regenerate-images regenerate-images-push \
+	size-examples size-example-50 size-example-100 size-example-200 size-example-500 size-example-1000 \
+	complexity-examples algorithm-examples
 
 # Build targets
 release: ${TARGET_RELEASE}
@@ -70,13 +72,77 @@ images-readme: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
 	${TARGET_RELEASE} --width 25 --height 25 --output ${IMG_DIR}/README_maze.png
 
-# Regenerate all images (all mazes + README images)
-regenerate-images: ${TARGET_RELEASE} all-mazes images-readme
+# Size examples (DOE - Design of Experiments)
+size-example-50: ${TARGET_RELEASE}
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --config config_size_50.toml
+
+size-example-100: ${TARGET_RELEASE}
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --config config_size_100.toml
+
+size-example-200: ${TARGET_RELEASE}
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --config config_size_200.toml
+
+size-example-500: ${TARGET_RELEASE}
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --config config_size_500.toml
+
+size-example-1000: ${TARGET_RELEASE}
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --config config_size_1000.toml
+
+# Generate all size examples
+size-examples: ${TARGET_RELEASE} size-example-50 size-example-100 size-example-200 size-example-500 size-example-1000
+
+# Complexity examples (DOE - Design of Experiments)
+# Generates mazes for all algorithms at all complexity levels (0.0 to 1.0 in steps of 0.1)
+# Uses config_complexity_examples.toml for cell_size=2 (100x100 pixel images)
+complexity-examples: ${TARGET_RELEASE}
+	@mkdir -p complexity_examples
+	@echo "Generating complexity examples..."
+	@for algo in recursive_backtracking kruskal prim aldous_broder; do \
+		for comp in 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0; do \
+			echo "  Generating $${algo} complexity $${comp}..."; \
+			${TARGET_RELEASE} \
+				--config config_complexity_examples.toml \
+				--algorithm $${algo} \
+				--complexity $${comp} \
+				--seed 12345 \
+				--output complexity_examples/$${algo}_complexity_$${comp}.png; \
+		done; \
+	done
+	@echo "Complexity examples generated"
+
+# Algorithm examples (DOE - Design of Experiments)
+# Generates mazes for all algorithms at complexity levels 0.0, 0.5, 1.0 with fixed seed and size
+# Used for ALGORITHM_EXAMPLES.md documentation
+algorithm-examples: ${TARGET_RELEASE}
+	@mkdir -p ${IMG_DIR}
+	@echo "Generating algorithm examples for ALGORITHM_EXAMPLES.md..."
+	@for algo in recursive_backtracking kruskal prim aldous_broder; do \
+		for comp in 0.0 0.5 1.0; do \
+			echo "  Generating $${algo} complexity $${comp}..."; \
+			${TARGET_RELEASE} \
+				--config config_doe.toml \
+				--algorithm $${algo} \
+				--complexity $${comp} \
+				--width 50 \
+				--height 50 \
+				--seed 12345 \
+				--output ${IMG_DIR}/$${algo}_$${comp}.png; \
+		done; \
+	done
+	@echo "Algorithm examples generated"
+
+# Regenerate all images (all mazes + README images + size examples + complexity examples + algorithm examples)
+regenerate-images: ${TARGET_RELEASE} all-mazes images-readme size-examples complexity-examples algorithm-examples
 	@echo "All images regenerated"
 
 # Regenerate all images, add to git, and push
 regenerate-images-push: regenerate-images
-	git add ${IMG_DIR}/*.png
+	git add ${IMG_DIR}/*.png complexity_examples/*.png
 	git commit -m "Regenerate all maze images" || true
 	git push
 
@@ -151,9 +217,23 @@ help:
 	@echo "  maze-normal      - Complexity 0.5"
 	@echo "  maze-complex     - Complexity 0.9"
 	@echo ""
+	@echo "Size examples (DOE - fixed 50x50 maze, varying resolution):"
+	@echo "  size-example-50   - 50x50 pixel image (cell_size=1)"
+	@echo "  size-example-100  - 100x100 pixel image (cell_size=2)"
+	@echo "  size-example-200  - 200x200 pixel image (cell_size=4)"
+	@echo "  size-example-500  - 500x500 pixel image (cell_size=10)"
+	@echo "  size-example-1000 - 1000x1000 pixel image (cell_size=20)"
+	@echo "  size-examples     - Generate all size examples"
+	@echo ""
+	@echo "Complexity examples (DOE - fixed seed/size, varying complexity 0.0-1.0):"
+	@echo "  complexity-examples - Generate all complexity examples for all algorithms"
+	@echo ""
+	@echo "Algorithm examples (DOE - fixed seed/size/complexity, varying algorithm):"
+	@echo "  algorithm-examples - Generate algorithm examples for ALGORITHM_EXAMPLES.md"
+	@echo ""
 	@echo "Image regeneration:"
 	@echo "  images-readme          - Generate README example images in .img directory"
-	@echo "  regenerate-images       - Regenerate all maze images"
+	@echo "  regenerate-images       - Regenerate all maze images (includes size, complexity, and algorithm examples)"
 	@echo "  regenerate-images-push  - Regenerate images, add to git, and push"
 	@echo ""
 	@echo "Clean targets:"
