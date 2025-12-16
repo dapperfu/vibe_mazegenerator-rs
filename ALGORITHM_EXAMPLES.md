@@ -7,7 +7,7 @@ This document demonstrates the four maze generation algorithms using a Design of
 ### Fixed Parameters
 - **Seed**: 12345 (for reproducibility)
 - **Maze Size**: 50×50 cells (medium)
-- **Image Size**: 100×100 pixels (cell_size = 2)
+- **Image Size**: 250×250 pixels (cell_size = 5)
 - **Complexity Values**: 0.0, 0.5, 1.0
 
 ### Variable Parameter
@@ -139,5 +139,5 @@ for algo in recursive_backtracking kruskal prim aldous_broder; do
 done
 ```
 
-Note: The `config_doe.toml` file contains `cell_size = 2` to produce 100×100 pixel images for 50×50 cell mazes.
+Note: The `config_doe.toml` file contains `cell_size = 5` to produce 250×250 pixel images for 50×50 cell mazes.
 
