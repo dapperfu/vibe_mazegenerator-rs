@@ -7,7 +7,7 @@ TARGET_DEBUG := target/debug/${PROJECT_NAME}
 MAZE_PNG := maze.png
 MAZE_SOLVED_PNG := maze_solved.png
 
-.PHONY: release debug clean maze maze-solved all-algorithms help
+.PHONY: release debug clean maze all-algorithms help
 
 # Build targets
 release: ${TARGET_RELEASE}
@@ -20,19 +20,16 @@ debug: ${TARGET_DEBUG}
 ${TARGET_DEBUG}:
 	${CARGO} build
 
-# Default maze generation (uses config.toml)
-maze: ${TARGET_RELEASE} ${MAZE_PNG}
+# Default maze generation (uses config.toml) - always generates solved version
+maze: ${TARGET_RELEASE} ${MAZE_PNG} ${MAZE_SOLVED_PNG}
 
 ${MAZE_PNG}: ${TARGET_RELEASE}
 	${TARGET_RELEASE}
 
-# Generate maze with solution
-maze-solved: ${TARGET_RELEASE} ${MAZE_SOLVED_PNG}
+${MAZE_SOLVED_PNG}: ${TARGET_RELEASE} ${MAZE_PNG}
+	@echo "Solved version already generated with maze"
 
-${MAZE_SOLVED_PNG}: ${TARGET_RELEASE}
-	${TARGET_RELEASE} --solve
-
-# Algorithm-specific targets
+# Algorithm-specific targets (always generate solved versions)
 maze-recursive-backtracking: ${TARGET_RELEASE}
 	${TARGET_RELEASE} --algorithm recursive_backtracking --output maze_recursive_backtracking.png
 
@@ -48,7 +45,7 @@ maze-aldous-broder: ${TARGET_RELEASE}
 # Generate all algorithms
 all-algorithms: ${TARGET_RELEASE} maze-recursive-backtracking maze-kruskal maze-prim maze-aldous-broder
 
-# Size presets
+# Size presets (always generate solved versions)
 maze-small: ${TARGET_RELEASE}
 	${TARGET_RELEASE} --width 20 --height 20 --output maze_small.png
 
@@ -60,19 +57,6 @@ maze-large: ${TARGET_RELEASE}
 
 maze-huge: ${TARGET_RELEASE}
 	${TARGET_RELEASE} --width 200 --height 200 --output maze_huge.png
-
-# Solved versions of size presets
-maze-small-solved: ${TARGET_RELEASE}
-	${TARGET_RELEASE} --width 20 --height 20 --output maze_small.png --solve
-
-maze-medium-solved: ${TARGET_RELEASE}
-	${TARGET_RELEASE} --width 50 --height 50 --output maze_medium.png --solve
-
-maze-large-solved: ${TARGET_RELEASE}
-	${TARGET_RELEASE} --width 100 --height 100 --output maze_large.png --solve
-
-maze-huge-solved: ${TARGET_RELEASE}
-	${TARGET_RELEASE} --width 200 --height 200 --output maze_huge.png --solve
 
 # Complexity variations
 maze-simple: ${TARGET_RELEASE}
@@ -106,8 +90,7 @@ help:
 	@echo "  debug            - Build debug binary"
 	@echo ""
 	@echo "Maze generation:"
-	@echo "  maze             - Generate default maze (maze.png)"
-	@echo "  maze-solved      - Generate maze with solution (maze.png + maze_solved.png)"
+	@echo "  maze             - Generate default maze with solution (maze.png + maze_solved.png)"
 	@echo ""
 	@echo "Algorithm-specific:"
 	@echo "  maze-recursive-backtracking - Generate using recursive backtracking"
@@ -116,12 +99,11 @@ help:
 	@echo "  maze-aldous-broder          - Generate using Aldous-Broder algorithm"
 	@echo "  all-algorithms              - Generate mazes with all algorithms"
 	@echo ""
-	@echo "Size presets:"
+	@echo "Size presets (all include solved versions):"
 	@echo "  maze-small       - 20x20 maze"
 	@echo "  maze-medium      - 50x50 maze"
 	@echo "  maze-large       - 100x100 maze"
 	@echo "  maze-huge        - 200x200 maze"
-	@echo "  maze-*-solved    - Same as above but with solution"
 	@echo ""
 	@echo "Complexity variations:"
 	@echo "  maze-simple      - Complexity 0.1"

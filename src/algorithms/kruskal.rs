@@ -1,6 +1,8 @@
 use crate::algorithms::MazeGenerator;
 use crate::maze::Maze;
 use rand::Rng;
+use rand::SeedableRng;
+use rand_chacha::ChaCha8Rng;
 
 /// Union-Find data structure for tracking connected components
 struct UnionFind {
@@ -47,9 +49,15 @@ impl UnionFind {
 pub struct Kruskal;
 
 impl MazeGenerator for Kruskal {
-    fn generate(&self, width: u32, height: u32, complexity: f64) -> Maze {
+    fn generate(&self, width: u32, height: u32, complexity: f64, seed: Option<u64>) -> Maze {
         let mut maze = Maze::new(width, height);
-        let mut rng = rand::thread_rng();
+        let mut rng = match seed {
+            Some(s) => ChaCha8Rng::seed_from_u64(s),
+            None => {
+                let seed = rand::thread_rng().gen();
+                ChaCha8Rng::seed_from_u64(seed)
+            }
+        };
         let mut uf = UnionFind::new((width * height) as usize);
 
         // Create list of all edges (walls between adjacent cells)

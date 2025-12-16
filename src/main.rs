@@ -35,9 +35,9 @@ struct Args {
     #[arg(long, default_value = "config.toml")]
     config: Option<String>,
 
-    /// Solve the maze and save solution to maze_solved.png
+    /// Seed for reproducible maze generation
     #[arg(long)]
-    solve: bool,
+    seed: Option<u64>,
 }
 
 fn main() {
@@ -50,6 +50,7 @@ fn main() {
         args.algorithm.as_deref(),
         args.complexity,
         args.output.as_deref(),
+        args.seed,
     );
 
     println!("Generating maze with:");
@@ -57,6 +58,11 @@ fn main() {
     println!("  Height: {}", config.height);
     println!("  Algorithm: {}", config.algorithm.to_string());
     println!("  Complexity: {:.2}", config.complexity);
+    if let Some(seed) = config.seed {
+        println!("  Seed: {}", seed);
+    } else {
+        println!("  Seed: random");
+    }
     println!("  Output: {}", config.output);
 
     // Select algorithm
@@ -71,7 +77,7 @@ fn main() {
 
     // Generate maze
     println!("Generating maze...");
-    let maze = generator.generate(config.width, config.height, config.complexity);
+    let maze = generator.generate(config.width, config.height, config.complexity, config.seed);
 
     // Save to PNG
     println!("Rendering to PNG...");
@@ -85,27 +91,30 @@ fn main() {
         }
     }
 
-    // Solve maze if requested
-    if args.solve {
-        println!("Solving maze...");
-        match maze.solve() {
-            Some(solution) => {
-                println!("Solution found with {} steps", solution.len());
-                let solved_path = "maze_solved.png";
-                match save_maze_with_solution(&maze, config.cell_size, &solution, solved_path) {
-                    Ok(()) => {
-                        println!("Solved maze saved to {}", solved_path);
-                    }
-                    Err(e) => {
-                        eprintln!("Error saving solved maze: {}", e);
-                        std::process::exit(1);
-                    }
+    // Always solve maze and save solution
+    println!("Solving maze...");
+    match maze.solve() {
+        Some(solution) => {
+            println!("Solution found with {} steps", solution.len());
+            // Generate solved filename based on output filename
+            let solved_path = if config.output.ends_with(".png") {
+                config.output.replace(".png", "_solved.png")
+            } else {
+                format!("{}_solved.png", config.output)
+            };
+            match save_maze_with_solution(&maze, config.cell_size, &solution, &solved_path) {
+                Ok(()) => {
+                    println!("Solved maze saved to {}", solved_path);
+                }
+                Err(e) => {
+                    eprintln!("Error saving solved maze: {}", e);
+                    std::process::exit(1);
                 }
             }
-            None => {
-                eprintln!("Error: Could not solve maze (no path found)");
-                std::process::exit(1);
-            }
+        }
+        None => {
+            eprintln!("Error: Could not solve maze (no path found)");
+            std::process::exit(1);
         }
     }
 }

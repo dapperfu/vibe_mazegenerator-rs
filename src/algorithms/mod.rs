@@ -8,10 +8,11 @@ pub trait MazeGenerator {
     /// * `width` - Width of the maze in cells
     /// * `height` - Height of the maze in cells
     /// * `complexity` - Complexity parameter (0.0 to 1.0), affects algorithm behavior
+    /// * `seed` - Optional seed for reproducible generation. If None, uses random seed.
     /// 
     /// # Returns
     /// A generated maze that is guaranteed to be solvable
-    fn generate(&self, width: u32, height: u32, complexity: f64) -> Maze;
+    fn generate(&self, width: u32, height: u32, complexity: f64, seed: Option<u64>) -> Maze;
 }
 
 pub mod recursive_backtracking;

@@ -38,6 +38,7 @@ pub struct Config {
     pub complexity: f64,
     pub output: String,
     pub cell_size: u32,
+    pub seed: Option<u64>,
 }
 
 impl Default for Config {
@@ -49,6 +50,7 @@ impl Default for Config {
             complexity: 0.5,
             output: "maze.png".to_string(),
             cell_size: 10,
+            seed: None,
         }
     }
 }
@@ -89,6 +91,10 @@ impl Config {
             config.cell_size = cell_size as u32;
         }
 
+        if let Some(seed) = parsed.get("seed").and_then(|v| v.as_integer()) {
+            config.seed = Some(seed as u64);
+        }
+
         Ok(config)
     }
 
@@ -118,6 +124,7 @@ impl Config {
         algorithm: Option<&str>,
         complexity: Option<f64>,
         output: Option<&str>,
+        seed: Option<u64>,
     ) -> Self {
         if let Some(w) = width {
             self.width = w;
@@ -135,6 +142,9 @@ impl Config {
         }
         if let Some(o) = output {
             self.output = o.to_string();
+        }
+        if let Some(s) = seed {
+            self.seed = Some(s);
         }
         self
     }
