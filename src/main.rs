@@ -1,7 +1,7 @@
-mod algorithms;
+pub mod algorithms;
 mod config;
-mod maze;
-mod render;
+pub mod maze;
+pub mod render;
 
 use clap::Parser;
 use config::{Algorithm, Config};

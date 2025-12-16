@@ -7,7 +7,7 @@ TARGET_DEBUG := target/debug/${PROJECT_NAME}
 MAZE_PNG := maze.png
 MAZE_SOLVED_PNG := maze_solved.png
 
-.PHONY: release debug clean maze all-algorithms help
+.PHONY: release debug clean maze all-algorithms all-mazes benchmark help
 
 # Build targets
 release: ${TARGET_RELEASE}
@@ -19,6 +19,13 @@ debug: ${TARGET_DEBUG}
 
 ${TARGET_DEBUG}:
 	${CARGO} build
+
+# Benchmark targets
+benchmark:
+	${CARGO} bench
+
+benchmark-quick:
+	${CARGO} bench -- --sample-size 10
 
 # Default maze generation (uses config.toml) - always generates solved version
 maze: ${TARGET_RELEASE} ${MAZE_PNG} ${MAZE_SOLVED_PNG}
@@ -44,6 +51,11 @@ maze-aldous-broder: ${TARGET_RELEASE}
 
 # Generate all algorithms
 all-algorithms: ${TARGET_RELEASE} maze-recursive-backtracking maze-kruskal maze-prim maze-aldous-broder
+
+# Generate all maze variations
+all-mazes: ${TARGET_RELEASE} maze maze-recursive-backtracking maze-kruskal maze-prim maze-aldous-broder \
+	maze-small maze-medium maze-large maze-huge \
+	maze-simple maze-normal maze-complex
 
 # Size presets (always generate solved versions)
 maze-small: ${TARGET_RELEASE}
@@ -88,6 +100,8 @@ help:
 	@echo "Build targets:"
 	@echo "  release          - Build release binary"
 	@echo "  debug            - Build debug binary"
+	@echo "  benchmark        - Run full benchmark suite"
+	@echo "  benchmark-quick  - Run quick benchmark suite"
 	@echo ""
 	@echo "Maze generation:"
 	@echo "  maze             - Generate default maze with solution (maze.png + maze_solved.png)"

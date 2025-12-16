@@ -1,0 +1,20 @@
+# Rust
+target/
+Cargo.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Generated maze images (optional - uncomment if you don't want to track them)
+# *.png
+# !README_maze.png
+# !README_maze_solved.png
+
