@@ -1,0 +1,135 @@
+PROJECT_NAME := maze_generator
+CARGO := cargo
+TARGET_RELEASE := target/release/${PROJECT_NAME}
+TARGET_DEBUG := target/debug/${PROJECT_NAME}
+
+# Output files
+MAZE_PNG := maze.png
+MAZE_SOLVED_PNG := maze_solved.png
+
+.PHONY: release debug clean maze maze-solved all-algorithms help
+
+# Build targets
+release: ${TARGET_RELEASE}
+
+${TARGET_RELEASE}:
+	${CARGO} build --release
+
+debug: ${TARGET_DEBUG}
+
+${TARGET_DEBUG}:
+	${CARGO} build
+
+# Default maze generation (uses config.toml)
+maze: ${TARGET_RELEASE} ${MAZE_PNG}
+
+${MAZE_PNG}: ${TARGET_RELEASE}
+	${TARGET_RELEASE}
+
+# Generate maze with solution
+maze-solved: ${TARGET_RELEASE} ${MAZE_SOLVED_PNG}
+
+${MAZE_SOLVED_PNG}: ${TARGET_RELEASE}
+	${TARGET_RELEASE} --solve
+
+# Algorithm-specific targets
+maze-recursive-backtracking: ${TARGET_RELEASE}
+	${TARGET_RELEASE} --algorithm recursive_backtracking --output maze_recursive_backtracking.png
+
+maze-kruskal: ${TARGET_RELEASE}
+	${TARGET_RELEASE} --algorithm kruskal --output maze_kruskal.png
+
+maze-prim: ${TARGET_RELEASE}
+	${TARGET_RELEASE} --algorithm prim --output maze_prim.png
+
+maze-aldous-broder: ${TARGET_RELEASE}
+	${TARGET_RELEASE} --algorithm aldous_broder --output maze_aldous_broder.png
+
+# Generate all algorithms
+all-algorithms: ${TARGET_RELEASE} maze-recursive-backtracking maze-kruskal maze-prim maze-aldous-broder
+
+# Size presets
+maze-small: ${TARGET_RELEASE}
+	${TARGET_RELEASE} --width 20 --height 20 --output maze_small.png
+
+maze-medium: ${TARGET_RELEASE}
+	${TARGET_RELEASE} --width 50 --height 50 --output maze_medium.png
+
+maze-large: ${TARGET_RELEASE}
+	${TARGET_RELEASE} --width 100 --height 100 --output maze_large.png
+
+maze-huge: ${TARGET_RELEASE}
+	${TARGET_RELEASE} --width 200 --height 200 --output maze_huge.png
+
+# Solved versions of size presets
+maze-small-solved: ${TARGET_RELEASE}
+	${TARGET_RELEASE} --width 20 --height 20 --output maze_small.png --solve
+
+maze-medium-solved: ${TARGET_RELEASE}
+	${TARGET_RELEASE} --width 50 --height 50 --output maze_medium.png --solve
+
+maze-large-solved: ${TARGET_RELEASE}
+	${TARGET_RELEASE} --width 100 --height 100 --output maze_large.png --solve
+
+maze-huge-solved: ${TARGET_RELEASE}
+	${TARGET_RELEASE} --width 200 --height 200 --output maze_huge.png --solve
+
+# Complexity variations
+maze-simple: ${TARGET_RELEASE}
+	${TARGET_RELEASE} --complexity 0.1 --output maze_simple.png
+
+maze-normal: ${TARGET_RELEASE}
+	${TARGET_RELEASE} --complexity 0.5 --output maze_normal.png
+
+maze-complex: ${TARGET_RELEASE}
+	${TARGET_RELEASE} --complexity 0.9 --output maze_complex.png
+
+# Clean targets
+clean:
+	${CARGO} clean
+	rm -f ${TARGET_RELEASE} ${TARGET_DEBUG}
+
+clean-outputs:
+	rm -f ${MAZE_PNG} ${MAZE_SOLVED_PNG} \
+		maze_*.png \
+		maze_small.png maze_medium.png maze_large.png maze_huge.png \
+		maze_simple.png maze_normal.png maze_complex.png
+
+clean-all: clean clean-outputs
+
+# Help target
+help:
+	@echo "Maze Generator Makefile Targets:"
+	@echo ""
+	@echo "Build targets:"
+	@echo "  release          - Build release binary"
+	@echo "  debug            - Build debug binary"
+	@echo ""
+	@echo "Maze generation:"
+	@echo "  maze             - Generate default maze (maze.png)"
+	@echo "  maze-solved      - Generate maze with solution (maze.png + maze_solved.png)"
+	@echo ""
+	@echo "Algorithm-specific:"
+	@echo "  maze-recursive-backtracking - Generate using recursive backtracking"
+	@echo "  maze-kruskal                - Generate using Kruskal's algorithm"
+	@echo "  maze-prim                   - Generate using Prim's algorithm"
+	@echo "  maze-aldous-broder          - Generate using Aldous-Broder algorithm"
+	@echo "  all-algorithms              - Generate mazes with all algorithms"
+	@echo ""
+	@echo "Size presets:"
+	@echo "  maze-small       - 20x20 maze"
+	@echo "  maze-medium      - 50x50 maze"
+	@echo "  maze-large       - 100x100 maze"
+	@echo "  maze-huge        - 200x200 maze"
+	@echo "  maze-*-solved    - Same as above but with solution"
+	@echo ""
+	@echo "Complexity variations:"
+	@echo "  maze-simple      - Complexity 0.1"
+	@echo "  maze-normal      - Complexity 0.5"
+	@echo "  maze-complex     - Complexity 0.9"
+	@echo ""
+	@echo "Clean targets:"
+	@echo "  clean            - Remove build artifacts"
+	@echo "  clean-outputs    - Remove all generated PNG files"
+	@echo "  clean-all        - Remove both build artifacts and outputs"
+
