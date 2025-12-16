@@ -37,8 +37,28 @@ impl MazeGenerator for RecursiveBacktracking {
                 // Push current cell back onto stack
                 stack.push((x, y));
 
-                // Choose a random unvisited neighbor
-                let next_idx = rng.gen_range(0..neighbors.len());
+                // Choose neighbor based on complexity
+                // Lower complexity = prefer first neighbor (more deterministic)
+                // Higher complexity = more random selection
+                let next_idx = if neighbors.len() == 1 {
+                    0
+                } else if complexity < 0.1 {
+                    // Very low complexity: always choose first neighbor (deterministic path)
+                    0
+                } else {
+                    // Higher complexity: more randomness in neighbor selection
+                    let bias = (1.0 - complexity).max(0.0);
+                    if rng.gen::<f64>() < bias {
+                        // Bias toward first neighbor when complexity is low
+                        if rng.gen::<f64>() < 0.7 {
+                            0
+                        } else {
+                            rng.gen_range(1..neighbors.len())
+                        }
+                    } else {
+                        rng.gen_range(0..neighbors.len())
+                    }
+                };
                 let (nx, ny) = neighbors[next_idx];
 
                 // Remove wall between current and chosen neighbor
@@ -49,8 +69,8 @@ impl MazeGenerator for RecursiveBacktracking {
                 stack.push((nx, ny));
             } else {
                 // No unvisited neighbors - backtrack based on complexity
-                // Higher complexity means more backtracking (more branches)
-                if complexity > 0.0 && rng.gen::<f64>() < complexity * 0.3 {
+                // Higher complexity means more backtracking (more branches/loops)
+                if complexity > 0.0 && rng.gen::<f64>() < complexity {
                     // Occasionally backtrack to create more branches
                     if let Some(&(bx, by)) = stack.last() {
                         if let Some(backtrack_neighbor) = maze

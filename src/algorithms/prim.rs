@@ -31,13 +31,27 @@ impl MazeGenerator for Prim {
         }
 
         while !frontier.is_empty() {
-            // Select a random edge from frontier
-            let edge_idx = if complexity > 0.0 {
-                // Higher complexity = more randomness in selection
-                let range = (frontier.len() as f64 * (1.0 - complexity * 0.5)).max(1.0) as usize;
-                rng.gen_range(0..range.min(frontier.len()))
+            // Select an edge from frontier based on complexity
+            // Lower complexity = prefer earlier edges (more deterministic growth)
+            // Higher complexity = more random selection
+            let edge_idx = if frontier.len() == 1 {
+                0
+            } else if complexity < 0.1 {
+                // Very low complexity: always choose first edge (deterministic tree growth)
+                0
             } else {
-                rng.gen_range(0..frontier.len())
+                // Higher complexity: bias toward random selection
+                let bias = (1.0 - complexity).max(0.0);
+                if rng.gen::<f64>() < bias {
+                    // Bias toward first edge when complexity is low
+                    if rng.gen::<f64>() < 0.7 {
+                        0
+                    } else {
+                        rng.gen_range(1..frontier.len())
+                    }
+                } else {
+                    rng.gen_range(0..frontier.len())
+                }
             };
 
             let (x1, y1, x2, y2) = frontier.remove(edge_idx);

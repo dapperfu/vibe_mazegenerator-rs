@@ -19,7 +19,7 @@ struct Args {
     #[arg(long)]
     height: Option<u32>,
 
-    /// Algorithm to use: recursive_backtracking, kruskal, prim, aldous_broder
+    /// Algorithm to use: recursive_backtracking, kruskal, prim, aldous_broder, wilsons, recursive_division, growing_tree, hunt_and_kill, binary_tree, sidewinder, eller, dfs_iterative, bfs, recursive_backtracking_braided, cellular_automata, drunkards_walk, random_obstacle, hamiltonian, voronoi
     #[arg(long)]
     algorithm: Option<String>,
 
@@ -83,6 +83,21 @@ fn main() {
         Algorithm::Kruskal => Box::new(algorithms::Kruskal),
         Algorithm::Prim => Box::new(algorithms::Prim),
         Algorithm::AldousBroder => Box::new(algorithms::AldousBroder),
+        Algorithm::Wilsons => Box::new(algorithms::Wilsons),
+        Algorithm::RecursiveDivision => Box::new(algorithms::RecursiveDivision),
+        Algorithm::GrowingTree => Box::new(algorithms::GrowingTree),
+        Algorithm::HuntAndKill => Box::new(algorithms::HuntAndKill),
+        Algorithm::BinaryTree => Box::new(algorithms::BinaryTree),
+        Algorithm::Sidewinder => Box::new(algorithms::Sidewinder),
+        Algorithm::Eller => Box::new(algorithms::Eller),
+        Algorithm::DfsIterative => Box::new(algorithms::DfsIterative),
+        Algorithm::Bfs => Box::new(algorithms::Bfs),
+        Algorithm::RecursiveBacktrackingBraided => Box::new(algorithms::RecursiveBacktrackingBraided),
+        Algorithm::CellularAutomata => Box::new(algorithms::CellularAutomata),
+        Algorithm::DrunkardsWalk => Box::new(algorithms::DrunkardsWalk),
+        Algorithm::RandomObstacle => Box::new(algorithms::RandomObstacle),
+        Algorithm::Hamiltonian => Box::new(algorithms::Hamiltonian),
+        Algorithm::Voronoi => Box::new(algorithms::Voronoi),
     };
 
     // Generate maze

@@ -75,8 +75,12 @@ impl MazeGenerator for Kruskal {
 
         // Shuffle edges based on complexity
         // Higher complexity = more randomness in edge selection
+        // At complexity 0.0, process edges in deterministic order (left-to-right, top-to-bottom)
+        // At complexity 1.0, fully randomize edge order
         if complexity > 0.0 {
-            for i in 0..edges.len() {
+            // Shuffle proportionally to complexity
+            let shuffle_count = (edges.len() as f64 * complexity) as usize;
+            for i in 0..shuffle_count {
                 let j = rng.gen_range(0..edges.len());
                 edges.swap(i, j);
             }
@@ -89,8 +93,10 @@ impl MazeGenerator for Kruskal {
 
             // If cells are in different sets, remove wall and union them
             if uf.find(idx1) != uf.find(idx2) {
-                // Apply complexity-based filtering: higher complexity allows more edges
-                if rng.gen::<f64>() < (1.0 - complexity * 0.3) || complexity < 0.1 {
+                // Apply complexity-based filtering: higher complexity allows MORE edges (creates loops)
+                // At complexity 0.0: only create minimum spanning tree (no loops)
+                // At complexity 1.0: allow many extra connections (many loops)
+                if complexity < 0.1 || rng.gen::<f64>() < (0.3 + complexity * 0.7) {
                     maze.remove_wall(x1, y1, x2, y2);
                     uf.union(idx1, idx2);
                 }
