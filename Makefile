@@ -7,7 +7,7 @@ TARGET_DEBUG := target/debug/${PROJECT_NAME}
 MAZE_PNG := maze.png
 MAZE_SOLVED_PNG := maze_solved.png
 
-.PHONY: release debug clean maze all-algorithms all-mazes benchmark help
+.PHONY: release debug clean maze all-algorithms all-mazes benchmark help images regenerate-images regenerate-images-push
 
 # Build targets
 release: ${TARGET_RELEASE}
@@ -57,6 +57,21 @@ all-mazes: ${TARGET_RELEASE} maze maze-recursive-backtracking maze-kruskal maze-
 	maze-small maze-medium maze-large maze-huge \
 	maze-simple maze-normal maze-complex
 
+# Generate README example images in .img directory
+images-readme: ${TARGET_RELEASE}
+	@mkdir -p .img
+	${TARGET_RELEASE} --width 25 --height 25 --output .img/README_maze.png
+
+# Regenerate all images (all mazes + README images)
+regenerate-images: ${TARGET_RELEASE} all-mazes images-readme
+	@echo "All images regenerated"
+
+# Regenerate all images, add to git, and push
+regenerate-images-push: regenerate-images
+	git add *.png .img/*.png
+	git commit -m "Regenerate all maze images" || true
+	git push
+
 # Size presets (always generate solved versions)
 maze-small: ${TARGET_RELEASE}
 	${TARGET_RELEASE} --width 20 --height 20 --output maze_small.png
@@ -90,6 +105,7 @@ clean-outputs:
 		maze_*.png \
 		maze_small.png maze_medium.png maze_large.png maze_huge.png \
 		maze_simple.png maze_normal.png maze_complex.png
+	rm -rf .img
 
 clean-all: clean clean-outputs
 
@@ -123,6 +139,11 @@ help:
 	@echo "  maze-simple      - Complexity 0.1"
 	@echo "  maze-normal      - Complexity 0.5"
 	@echo "  maze-complex     - Complexity 0.9"
+	@echo ""
+	@echo "Image regeneration:"
+	@echo "  images-readme          - Generate README example images in .img directory"
+	@echo "  regenerate-images       - Regenerate all maze images"
+	@echo "  regenerate-images-push  - Regenerate images, add to git, and push"
 	@echo ""
 	@echo "Clean targets:"
 	@echo "  clean            - Remove build artifacts"

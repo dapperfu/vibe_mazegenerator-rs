@@ -141,11 +141,11 @@ Command-line arguments override configuration file settings.
 
 ### Example Maze (Unsolved)
 
-![Unsolved Maze](README_maze.png)
+![Unsolved Maze](.img/README_maze.png)
 
 ### Example Maze (Solved)
 
-![Solved Maze](README_maze_solved.png)
+![Solved Maze](.img/README_maze_solved.png)
 
 ## Benchmarking
 
