@@ -1,0 +1,135 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            platform: linux
+            arch: x86_64
+            binary_name: maze_generator
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            platform: macos
+            arch: x86_64
+            binary_name: maze_generator
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            platform: macos
+            arch: arm64
+            binary_name: maze_generator
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            platform: windows
+            arch: x86_64
+            binary_name: maze_generator.exe
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-${{ matrix.target }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.target }}-cargo-
+      
+      - name: Build release
+        run: cargo build --release --target ${{ matrix.target }}
+      
+      - name: Prepare binary
+        shell: bash
+        run: |
+          BINARY_PATH="target/${{ matrix.target }}/release/${{ matrix.binary_name }}"
+          # Strip binary to reduce size (Linux/macOS only)
+          if [ "${{ runner.os }}" != "Windows" ]; then
+            strip "$BINARY_PATH" || true
+            chmod +x "$BINARY_PATH"
+          fi
+          echo "BINARY_PATH=$BINARY_PATH" >> $GITHUB_ENV
+      
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}-${{ matrix.arch }}
+          path: ${{ env.BINARY_PATH }}
+          retention-days: 1
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      
+      - name: Prepare release assets
+        shell: bash
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          mkdir -p release-assets
+          
+          # Rename and organize binaries from artifact directories
+          for dir in artifacts/*/; do
+            if [ -d "$dir" ]; then
+              platform_arch=$(basename "$dir")
+              binary_file=$(find "$dir" -type f | head -n 1)
+              
+              if [ -n "$binary_file" ]; then
+                if [[ "$platform_arch" == *"linux"* ]]; then
+                  cp "$binary_file" "release-assets/maze_generator-${VERSION}-linux-x86_64"
+                  chmod +x "release-assets/maze_generator-${VERSION}-linux-x86_64"
+                elif [[ "$platform_arch" == *"macos-x86_64"* ]]; then
+                  cp "$binary_file" "release-assets/maze_generator-${VERSION}-macos-x86_64"
+                  chmod +x "release-assets/maze_generator-${VERSION}-macos-x86_64"
+                elif [[ "$platform_arch" == *"macos-arm64"* ]]; then
+                  cp "$binary_file" "release-assets/maze_generator-${VERSION}-macos-arm64"
+                  chmod +x "release-assets/maze_generator-${VERSION}-macos-arm64"
+                elif [[ "$platform_arch" == *"windows"* ]]; then
+                  cp "$binary_file" "release-assets/maze_generator-${VERSION}-windows-x86_64.exe"
+                fi
+              fi
+            fi
+          done
+          
+          echo "Release assets prepared:"
+          ls -lh release-assets/
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release-assets/*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
