@@ -38,6 +38,14 @@ struct Args {
     /// Seed for reproducible maze generation
     #[arg(long)]
     seed: Option<u64>,
+
+    /// Solution line color (hex code, e.g., "#ff0000" or "ff0000")
+    #[arg(long)]
+    line_color: Option<String>,
+
+    /// Solution line thickness (overrides auto-calculation)
+    #[arg(long)]
+    line_thickness: Option<f32>,
 }
 
 fn main() {
@@ -51,6 +59,8 @@ fn main() {
         args.complexity,
         args.output.as_deref(),
         args.seed,
+        args.line_color.as_deref(),
+        args.line_thickness,
     );
 
     println!("Generating maze with:");
@@ -102,7 +112,14 @@ fn main() {
             } else {
                 format!("{}_solved.png", config.output)
             };
-            match save_maze_with_solution(&maze, config.cell_size, &solution, &solved_path) {
+            match save_maze_with_solution(
+                &maze,
+                config.cell_size,
+                &solution,
+                &solved_path,
+                &config.solution_line_color,
+                config.solution_line_thickness,
+            ) {
                 Ok(()) => {
                     println!("Solved maze saved to {}", solved_path);
                 }

@@ -1,6 +1,31 @@
 use std::fs;
 use std::path::Path;
 
+/// Parse a hex color string to RGB values
+/// Accepts formats: "#ff0000", "ff0000", "#FF0000", "FF0000"
+/// Returns (r, g, b) as u8 values
+pub fn parse_hex_color(hex: &str) -> Result<[u8; 3], String> {
+    let hex = hex.trim();
+    let hex = if hex.starts_with('#') {
+        &hex[1..]
+    } else {
+        hex
+    };
+
+    if hex.len() != 6 {
+        return Err(format!("Hex color must be 6 digits, got: {}", hex));
+    }
+
+    let r = u8::from_str_radix(&hex[0..2], 16)
+        .map_err(|e| format!("Invalid hex color (R): {}", e))?;
+    let g = u8::from_str_radix(&hex[2..4], 16)
+        .map_err(|e| format!("Invalid hex color (G): {}", e))?;
+    let b = u8::from_str_radix(&hex[4..6], 16)
+        .map_err(|e| format!("Invalid hex color (B): {}", e))?;
+
+    Ok([r, g, b])
+}
+
 #[derive(Debug, Clone)]
 pub enum Algorithm {
     RecursiveBacktracking,
@@ -39,6 +64,8 @@ pub struct Config {
     pub output: String,
     pub cell_size: u32,
     pub seed: Option<u64>,
+    pub solution_line_color: String,
+    pub solution_line_thickness: Option<f32>,
 }
 
 impl Default for Config {
@@ -51,6 +78,8 @@ impl Default for Config {
             output: "maze.png".to_string(),
             cell_size: 10,
             seed: None,
+            solution_line_color: "#ff0000".to_string(),
+            solution_line_thickness: None,
         }
     }
 }
@@ -95,6 +124,23 @@ impl Config {
             config.seed = Some(seed as u64);
         }
 
+        if let Some(line_color) = parsed.get("line_color").and_then(|v| v.as_str()) {
+            // Validate the hex color format
+            if parse_hex_color(line_color).is_ok() {
+                config.solution_line_color = line_color.to_string();
+            } else {
+                return Err(format!("Invalid line_color format: {}", line_color));
+            }
+        }
+
+        if let Some(line_thickness) = parsed.get("line_thickness").and_then(|v| v.as_float()) {
+            if line_thickness > 0.0 {
+                config.solution_line_thickness = Some(line_thickness as f32);
+            } else {
+                return Err("line_thickness must be greater than 0".to_string());
+            }
+        }
+
         Ok(config)
     }
 
@@ -125,6 +171,8 @@ impl Config {
         complexity: Option<f64>,
         output: Option<&str>,
         seed: Option<u64>,
+        line_color: Option<&str>,
+        line_thickness: Option<f32>,
     ) -> Self {
         if let Some(w) = width {
             self.width = w;
@@ -145,6 +193,16 @@ impl Config {
         }
         if let Some(s) = seed {
             self.seed = Some(s);
+        }
+        if let Some(lc) = line_color {
+            if parse_hex_color(lc).is_ok() {
+                self.solution_line_color = lc.to_string();
+            }
+        }
+        if let Some(lt) = line_thickness {
+            if lt > 0.0 {
+                self.solution_line_thickness = Some(lt);
+            }
         }
         self
     }

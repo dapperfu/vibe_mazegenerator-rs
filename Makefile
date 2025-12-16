@@ -3,9 +3,12 @@ CARGO := cargo
 TARGET_RELEASE := target/release/${PROJECT_NAME}
 TARGET_DEBUG := target/debug/${PROJECT_NAME}
 
+# Output directory
+IMG_DIR := .img
+
 # Output files
-MAZE_PNG := maze.png
-MAZE_SOLVED_PNG := maze_solved.png
+MAZE_PNG := ${IMG_DIR}/maze.png
+MAZE_SOLVED_PNG := ${IMG_DIR}/maze_solved.png
 
 .PHONY: release debug clean maze all-algorithms all-mazes benchmark help images regenerate-images regenerate-images-push
 
@@ -31,23 +34,28 @@ benchmark-quick:
 maze: ${TARGET_RELEASE} ${MAZE_PNG} ${MAZE_SOLVED_PNG}
 
 ${MAZE_PNG}: ${TARGET_RELEASE}
-	${TARGET_RELEASE}
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --output ${MAZE_PNG}
 
 ${MAZE_SOLVED_PNG}: ${TARGET_RELEASE} ${MAZE_PNG}
 	@echo "Solved version already generated with maze"
 
 # Algorithm-specific targets (always generate solved versions)
 maze-recursive-backtracking: ${TARGET_RELEASE}
-	${TARGET_RELEASE} --algorithm recursive_backtracking --output maze_recursive_backtracking.png
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --algorithm recursive_backtracking --output ${IMG_DIR}/maze_recursive_backtracking.png
 
 maze-kruskal: ${TARGET_RELEASE}
-	${TARGET_RELEASE} --algorithm kruskal --output maze_kruskal.png
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --algorithm kruskal --output ${IMG_DIR}/maze_kruskal.png
 
 maze-prim: ${TARGET_RELEASE}
-	${TARGET_RELEASE} --algorithm prim --output maze_prim.png
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --algorithm prim --output ${IMG_DIR}/maze_prim.png
 
 maze-aldous-broder: ${TARGET_RELEASE}
-	${TARGET_RELEASE} --algorithm aldous_broder --output maze_aldous_broder.png
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --algorithm aldous_broder --output ${IMG_DIR}/maze_aldous_broder.png
 
 # Generate all algorithms
 all-algorithms: ${TARGET_RELEASE} maze-recursive-backtracking maze-kruskal maze-prim maze-aldous-broder
@@ -59,8 +67,8 @@ all-mazes: ${TARGET_RELEASE} maze maze-recursive-backtracking maze-kruskal maze-
 
 # Generate README example images in .img directory
 images-readme: ${TARGET_RELEASE}
-	@mkdir -p .img
-	${TARGET_RELEASE} --width 25 --height 25 --output .img/README_maze.png
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --width 25 --height 25 --output ${IMG_DIR}/README_maze.png
 
 # Regenerate all images (all mazes + README images)
 regenerate-images: ${TARGET_RELEASE} all-mazes images-readme
@@ -68,32 +76,39 @@ regenerate-images: ${TARGET_RELEASE} all-mazes images-readme
 
 # Regenerate all images, add to git, and push
 regenerate-images-push: regenerate-images
-	git add *.png .img/*.png
+	git add ${IMG_DIR}/*.png
 	git commit -m "Regenerate all maze images" || true
 	git push
 
 # Size presets (always generate solved versions)
 maze-small: ${TARGET_RELEASE}
-	${TARGET_RELEASE} --width 20 --height 20 --output maze_small.png
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --width 20 --height 20 --output ${IMG_DIR}/maze_small.png
 
 maze-medium: ${TARGET_RELEASE}
-	${TARGET_RELEASE} --width 50 --height 50 --output maze_medium.png
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --width 50 --height 50 --output ${IMG_DIR}/maze_medium.png
 
 maze-large: ${TARGET_RELEASE}
-	${TARGET_RELEASE} --width 100 --height 100 --output maze_large.png
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --width 100 --height 100 --output ${IMG_DIR}/maze_large.png
 
 maze-huge: ${TARGET_RELEASE}
-	${TARGET_RELEASE} --width 200 --height 200 --output maze_huge.png
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --width 200 --height 200 --output ${IMG_DIR}/maze_huge.png
 
 # Complexity variations
 maze-simple: ${TARGET_RELEASE}
-	${TARGET_RELEASE} --complexity 0.1 --output maze_simple.png
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --complexity 0.1 --output ${IMG_DIR}/maze_simple.png
 
 maze-normal: ${TARGET_RELEASE}
-	${TARGET_RELEASE} --complexity 0.5 --output maze_normal.png
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --complexity 0.5 --output ${IMG_DIR}/maze_normal.png
 
 maze-complex: ${TARGET_RELEASE}
-	${TARGET_RELEASE} --complexity 0.9 --output maze_complex.png
+	@mkdir -p ${IMG_DIR}
+	${TARGET_RELEASE} --complexity 0.9 --output ${IMG_DIR}/maze_complex.png
 
 # Clean targets
 clean:
@@ -101,11 +116,7 @@ clean:
 	rm -f ${TARGET_RELEASE} ${TARGET_DEBUG}
 
 clean-outputs:
-	rm -f ${MAZE_PNG} ${MAZE_SOLVED_PNG} \
-		maze_*.png \
-		maze_small.png maze_medium.png maze_large.png maze_huge.png \
-		maze_simple.png maze_normal.png maze_complex.png
-	rm -rf .img
+	rm -rf ${IMG_DIR}
 
 clean-all: clean clean-outputs
 
@@ -120,7 +131,7 @@ help:
 	@echo "  benchmark-quick  - Run quick benchmark suite"
 	@echo ""
 	@echo "Maze generation:"
-	@echo "  maze             - Generate default maze with solution (maze.png + maze_solved.png)"
+	@echo "  maze             - Generate default maze with solution (.img/maze.png + .img/maze_solved.png)"
 	@echo ""
 	@echo "Algorithm-specific:"
 	@echo "  maze-recursive-backtracking - Generate using recursive backtracking"

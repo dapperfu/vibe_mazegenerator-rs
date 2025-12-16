@@ -70,12 +70,12 @@ make maze
 ```
 
 **Output Files:**
-- `maze.png` - Unsolved maze
-- `maze_solved.png` - Solved maze with path highlighted
+- `.img/maze.png` - Unsolved maze
+- `.img/maze_solved.png` - Solved maze with path highlighted
 
-![Unsolved Maze](maze.png)
+![Unsolved Maze](.img/maze.png)
 
-![Solved Maze](maze_solved.png)
+![Solved Maze](.img/maze_solved.png)
 
 ---
 
@@ -91,12 +91,12 @@ make maze-recursive-backtracking
 ```
 
 **Output Files:**
-- `maze_recursive_backtracking.png` - Unsolved maze
-- `maze_recursive_backtracking_solved.png` - Solved maze
+- `.img/maze_recursive_backtracking.png` - Unsolved maze
+- `.img/maze_recursive_backtracking_solved.png` - Solved maze
 
-![Unsolved Maze](maze_recursive_backtracking.png)
+![Unsolved Maze](.img/maze_recursive_backtracking.png)
 
-![Solved Maze](maze_recursive_backtracking_solved.png)
+![Solved Maze](.img/maze_recursive_backtracking_solved.png)
 
 ---
 
@@ -110,12 +110,12 @@ make maze-kruskal
 ```
 
 **Output Files:**
-- `maze_kruskal.png` - Unsolved maze
-- `maze_kruskal_solved.png` - Solved maze
+- `.img/maze_kruskal.png` - Unsolved maze
+- `.img/maze_kruskal_solved.png` - Solved maze
 
-![Unsolved Maze](maze_kruskal.png)
+![Unsolved Maze](.img/maze_kruskal.png)
 
-![Solved Maze](maze_kruskal_solved.png)
+![Solved Maze](.img/maze_kruskal_solved.png)
 
 ---
 
@@ -129,12 +129,12 @@ make maze-prim
 ```
 
 **Output Files:**
-- `maze_prim.png` - Unsolved maze
-- `maze_prim_solved.png` - Solved maze
+- `.img/maze_prim.png` - Unsolved maze
+- `.img/maze_prim_solved.png` - Solved maze
 
-![Unsolved Maze](maze_prim.png)
+![Unsolved Maze](.img/maze_prim.png)
 
-![Solved Maze](maze_prim_solved.png)
+![Solved Maze](.img/maze_prim_solved.png)
 
 ---
 
@@ -148,12 +148,12 @@ make maze-aldous-broder
 ```
 
 **Output Files:**
-- `maze_aldous_broder.png` - Unsolved maze
-- `maze_aldous_broder_solved.png` - Solved maze
+- `.img/maze_aldous_broder.png` - Unsolved maze
+- `.img/maze_aldous_broder_solved.png` - Solved maze
 
-![Unsolved Maze](maze_aldous_broder.png)
+![Unsolved Maze](.img/maze_aldous_broder.png)
 
-![Solved Maze](maze_aldous_broder_solved.png)
+![Solved Maze](.img/maze_aldous_broder_solved.png)
 
 ---
 
@@ -182,12 +182,12 @@ make maze-small
 ```
 
 **Output Files:**
-- `maze_small.png` - Unsolved maze
-- `maze_small_solved.png` - Solved maze
+- `.img/maze_small.png` - Unsolved maze
+- `.img/maze_small_solved.png` - Solved maze
 
-![Unsolved Maze](maze_small.png)
+![Unsolved Maze](.img/maze_small.png)
 
-![Solved Maze](maze_small_solved.png)
+![Solved Maze](.img/maze_small_solved.png)
 
 ---
 
@@ -201,12 +201,12 @@ make maze-medium
 ```
 
 **Output Files:**
-- `maze_medium.png` - Unsolved maze
-- `maze_medium_solved.png` - Solved maze
+- `.img/maze_medium.png` - Unsolved maze
+- `.img/maze_medium_solved.png` - Solved maze
 
-![Unsolved Maze](maze_medium.png)
+![Unsolved Maze](.img/maze_medium.png)
 
-![Solved Maze](maze_medium_solved.png)
+![Solved Maze](.img/maze_medium_solved.png)
 
 ---
 
@@ -220,12 +220,12 @@ make maze-large
 ```
 
 **Output Files:**
-- `maze_large.png` - Unsolved maze
-- `maze_large_solved.png` - Solved maze
+- `.img/maze_large.png` - Unsolved maze
+- `.img/maze_large_solved.png` - Solved maze
 
-![Unsolved Maze](maze_large.png)
+![Unsolved Maze](.img/maze_large.png)
 
-![Solved Maze](maze_large_solved.png)
+![Solved Maze](.img/maze_large_solved.png)
 
 ---
 
@@ -239,12 +239,12 @@ make maze-huge
 ```
 
 **Output Files:**
-- `maze_huge.png` - Unsolved maze
-- `maze_huge_solved.png` - Solved maze
+- `.img/maze_huge.png` - Unsolved maze
+- `.img/maze_huge_solved.png` - Solved maze
 
-![Unsolved Maze](maze_huge.png)
+![Unsolved Maze](.img/maze_huge.png)
 
-![Solved Maze](maze_huge_solved.png)
+![Solved Maze](.img/maze_huge_solved.png)
 
 ---
 
@@ -260,12 +260,12 @@ make maze-simple
 ```
 
 **Output Files:**
-- `maze_simple.png` - Unsolved maze
-- `maze_simple_solved.png` - Solved maze
+- `.img/maze_simple.png` - Unsolved maze
+- `.img/maze_simple_solved.png` - Solved maze
 
-![Unsolved Maze](maze_simple.png)
+![Unsolved Maze](.img/maze_simple.png)
 
-![Solved Maze](maze_simple_solved.png)
+![Solved Maze](.img/maze_simple_solved.png)
 
 ---
 
@@ -279,12 +279,12 @@ make maze-normal
 ```
 
 **Output Files:**
-- `maze_normal.png` - Unsolved maze
-- `maze_normal_solved.png` - Solved maze
+- `.img/maze_normal.png` - Unsolved maze
+- `.img/maze_normal_solved.png` - Solved maze
 
-![Unsolved Maze](maze_normal.png)
+![Unsolved Maze](.img/maze_normal.png)
 
-![Solved Maze](maze_normal_solved.png)
+![Solved Maze](.img/maze_normal_solved.png)
 
 ---
 
@@ -298,12 +298,12 @@ make maze-complex
 ```
 
 **Output Files:**
-- `maze_complex.png` - Unsolved maze
-- `maze_complex_solved.png` - Solved maze
+- `.img/maze_complex.png` - Unsolved maze
+- `.img/maze_complex_solved.png` - Solved maze
 
-![Unsolved Maze](maze_complex.png)
+![Unsolved Maze](.img/maze_complex.png)
 
-![Solved Maze](maze_complex_solved.png)
+![Solved Maze](.img/maze_complex_solved.png)
 
 ---
 
@@ -350,7 +350,7 @@ Removes all generated PNG maze files.
 make clean-outputs
 ```
 
-**Effect:** Removes all `*.png` maze files from the project directory
+**Effect:** Removes `.img/` directory and all generated maze files
 
 ---
 
@@ -363,7 +363,7 @@ Removes both build artifacts and all generated maze files.
 make clean-all
 ```
 
-**Effect:** Removes both `target/` directory and all `*.png` maze files
+**Effect:** Removes both `target/` directory and `.img/` directory
 
 ---
 
