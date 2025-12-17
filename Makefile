@@ -12,7 +12,7 @@ MAZE_SOLVED_PNG := ${IMG_DIR}/maze_solved.png
 
 .PHONY: release debug clean maze all-algorithms all-mazes benchmark help images regenerate-images regenerate-images-push \
 	size-examples size-example-50 size-example-100 size-example-200 size-example-500 size-example-1000 \
-	complexity-examples algorithm-examples
+	complexity-examples algorithm-examples serve-docs
 
 # Build targets
 release: ${TARGET_RELEASE}
@@ -30,14 +30,14 @@ benchmark:
 	${CARGO} bench
 
 benchmark-quick:
-	${CARGO} bench -- --sample-size 10
+	${CARGO} bench --bench maze_generation -- --sample-size 10
 
 # Default maze generation (uses config.toml) - always generates solved version
 maze: ${TARGET_RELEASE} ${MAZE_PNG} ${MAZE_SOLVED_PNG}
 
 ${MAZE_PNG}: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --output ${MAZE_PNG}
+	timeout 60 ${TARGET_RELEASE} --output ${MAZE_PNG}
 
 ${MAZE_SOLVED_PNG}: ${TARGET_RELEASE} ${MAZE_PNG}
 	@echo "Solved version already generated with maze"
@@ -45,19 +45,19 @@ ${MAZE_SOLVED_PNG}: ${TARGET_RELEASE} ${MAZE_PNG}
 # Algorithm-specific targets (always generate solved versions)
 maze-recursive-backtracking: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --algorithm recursive_backtracking --output ${IMG_DIR}/maze_recursive_backtracking.png
+	timeout 60 ${TARGET_RELEASE} --algorithm recursive_backtracking --output ${IMG_DIR}/maze_recursive_backtracking.png
 
 maze-kruskal: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --algorithm kruskal --output ${IMG_DIR}/maze_kruskal.png
+	timeout 60 ${TARGET_RELEASE} --algorithm kruskal --output ${IMG_DIR}/maze_kruskal.png
 
 maze-prim: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --algorithm prim --output ${IMG_DIR}/maze_prim.png
+	timeout 60 ${TARGET_RELEASE} --algorithm prim --output ${IMG_DIR}/maze_prim.png
 
 maze-aldous-broder: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --algorithm aldous_broder --output ${IMG_DIR}/maze_aldous_broder.png
+	timeout 60 ${TARGET_RELEASE} --algorithm aldous_broder --output ${IMG_DIR}/maze_aldous_broder.png
 
 # Generate all algorithms
 all-algorithms: ${TARGET_RELEASE} maze-recursive-backtracking maze-kruskal maze-prim maze-aldous-broder
@@ -70,28 +70,28 @@ all-mazes: ${TARGET_RELEASE} maze maze-recursive-backtracking maze-kruskal maze-
 # Generate README example images in .img directory
 images-readme: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --width 25 --height 25 --output ${IMG_DIR}/README_maze.png
+	timeout 60 ${TARGET_RELEASE} --width 25 --height 25 --output ${IMG_DIR}/README_maze.png
 
 # Size examples (DOE - Design of Experiments)
 size-example-50: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --config config_size_50.toml
+	timeout 60 ${TARGET_RELEASE} --config config_size_50.toml
 
 size-example-100: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --config config_size_100.toml
+	timeout 60 ${TARGET_RELEASE} --config config_size_100.toml
 
 size-example-200: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --config config_size_200.toml
+	timeout 60 ${TARGET_RELEASE} --config config_size_200.toml
 
 size-example-500: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --config config_size_500.toml
+	timeout 60 ${TARGET_RELEASE} --config config_size_500.toml
 
 size-example-1000: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --config config_size_1000.toml
+	timeout 60 ${TARGET_RELEASE} --config config_size_1000.toml
 
 # Generate all size examples
 size-examples: ${TARGET_RELEASE} size-example-50 size-example-100 size-example-200 size-example-500 size-example-1000
@@ -105,7 +105,7 @@ complexity-examples: ${TARGET_RELEASE}
 	@for algo in recursive_backtracking kruskal prim aldous_broder; do \
 		for comp in 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0; do \
 			echo "  Generating $${algo} complexity $${comp}..."; \
-			${TARGET_RELEASE} \
+			timeout 60 ${TARGET_RELEASE} \
 				--config config_complexity_examples.toml \
 				--algorithm $${algo} \
 				--complexity $${comp} \
@@ -121,10 +121,10 @@ complexity-examples: ${TARGET_RELEASE}
 algorithm-examples: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
 	@echo "Generating algorithm examples for ALGORITHM_EXAMPLES.md..."
-	@for algo in recursive_backtracking kruskal prim aldous_broder; do \
+	@for algo in recursive_backtracking kruskal prim aldous_broder wilsons recursive_division growing_tree hunt_and_kill binary_tree sidewinder eller dfs_iterative bfs recursive_backtracking_braided cellular_automata drunkards_walk random_obstacle hamiltonian voronoi; do \
 		for comp in 0.0 0.5 1.0; do \
 			echo "  Generating $${algo} complexity $${comp}..."; \
-			${TARGET_RELEASE} \
+			timeout 60 ${TARGET_RELEASE} \
 				--config config_doe.toml \
 				--algorithm $${algo} \
 				--complexity $${comp} \
@@ -149,32 +149,32 @@ regenerate-images-push: regenerate-images
 # Size presets (always generate solved versions)
 maze-small: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --width 20 --height 20 --output ${IMG_DIR}/maze_small.png
+	timeout 60 ${TARGET_RELEASE} --width 20 --height 20 --output ${IMG_DIR}/maze_small.png
 
 maze-medium: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --width 50 --height 50 --output ${IMG_DIR}/maze_medium.png
+	timeout 60 ${TARGET_RELEASE} --width 50 --height 50 --output ${IMG_DIR}/maze_medium.png
 
 maze-large: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --width 100 --height 100 --output ${IMG_DIR}/maze_large.png
+	timeout 60 ${TARGET_RELEASE} --width 100 --height 100 --output ${IMG_DIR}/maze_large.png
 
 maze-huge: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --width 200 --height 200 --output ${IMG_DIR}/maze_huge.png
+	timeout 60 ${TARGET_RELEASE} --width 200 --height 200 --output ${IMG_DIR}/maze_huge.png
 
 # Complexity variations
 maze-simple: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --complexity 0.1 --output ${IMG_DIR}/maze_simple.png
+	timeout 60 ${TARGET_RELEASE} --complexity 0.1 --output ${IMG_DIR}/maze_simple.png
 
 maze-normal: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --complexity 0.5 --output ${IMG_DIR}/maze_normal.png
+	timeout 60 ${TARGET_RELEASE} --complexity 0.5 --output ${IMG_DIR}/maze_normal.png
 
 maze-complex: ${TARGET_RELEASE}
 	@mkdir -p ${IMG_DIR}
-	${TARGET_RELEASE} --complexity 0.9 --output ${IMG_DIR}/maze_complex.png
+	timeout 60 ${TARGET_RELEASE} --complexity 0.9 --output ${IMG_DIR}/maze_complex.png
 
 # Clean targets
 clean:
@@ -186,6 +186,12 @@ clean-outputs:
 
 clean-all: clean clean-outputs
 
+# Serve docs locally for GitHub Pages preview
+serve-docs:
+	@echo "Serving docs/ directory on http://localhost:8000"
+	@echo "Press Ctrl+C to stop the server"
+	@cd docs && python3 -m http.server 8000
+
 # Help target
 help:
 	@echo "Maze Generator Makefile Targets:"
@@ -195,6 +201,9 @@ help:
 	@echo "  debug            - Build debug binary"
 	@echo "  benchmark        - Run full benchmark suite"
 	@echo "  benchmark-quick  - Run quick benchmark suite"
+	@echo ""
+	@echo "Documentation:"
+	@echo "  serve-docs       - Serve docs/ directory locally on http://localhost:8000"
 	@echo ""
 	@echo "Maze generation:"
 	@echo "  maze             - Generate default maze with solution (.img/maze.png + .img/maze_solved.png)"

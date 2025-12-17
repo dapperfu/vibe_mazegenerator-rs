@@ -154,6 +154,20 @@ Then run each with:
 ./target/release/maze_generator --config config_size_1000.toml
 ```
 
+## Size Examples
+
+The following examples demonstrate the same maze structure (50×50 cells, seed 12345) rendered at different resolutions. All examples use the recursive_backtracking algorithm with complexity 0.5.
+
+### Resolution Comparison
+
+| Image Size (pixels) | cell_size | Unsolved Maze | Solved Maze |
+|---------------------|-----------|---------------|-------------|
+| 50×50 | 1 | ![Size Example 50×50](.img/size_example_50x50.png) | ![Size Example 50×50 Solved](.img/size_example_50x50_solved.png) |
+| 100×100 | 2 | ![Size Example 100×100](.img/size_example_100x100.png) | ![Size Example 100×100 Solved](.img/size_example_100x100_solved.png) |
+| 200×200 | 4 | ![Size Example 200×200](.img/size_example_200x200.png) | ![Size Example 200×200 Solved](.img/size_example_200x200_solved.png) |
+| 500×500 | 10 | ![Size Example 500×500](.img/size_example_500x500.png) | ![Size Example 500×500 Solved](.img/size_example_500x500_solved.png) |
+| 1000×1000 | 20 | ![Size Example 1000×1000](.img/size_example_1000x1000.png) | ![Size Example 1000×1000 Solved](.img/size_example_1000x1000_solved.png) |
+
 ## Expected Results
 
 ### Visual Impact of Resolution
