@@ -1,0 +1,21 @@
+{
+  "name": "maze_generator",
+  "type": "module",
+  "description": "A high-performance maze generator written in Rust that supports multiple generation algorithms and automatically solves generated mazes",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dapperfu/vibe_mazegenerator-rs"
+  },
+  "files": [
+    "maze_generator_bg.wasm",
+    "maze_generator.js",
+    "maze_generator.d.ts"
+  ],
+  "main": "maze_generator.js",
+  "types": "maze_generator.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
