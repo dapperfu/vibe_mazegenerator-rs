@@ -1,5 +1,6 @@
 use crate::maze::Maze;
-use image::{ImageBuffer, Rgb, RgbImage};
+use image::{DynamicImage, ImageBuffer, Rgb, RgbImage};
+use std::io::Cursor;
 
 /// Parse a hex color string to RGB values
 /// Accepts formats: "#ff0000", "ff0000", "#FF0000", "FF0000"
@@ -149,11 +150,15 @@ fn draw_line(
     let mut x = x0;
     let mut y = y0;
 
-    let thickness_int = thickness.max(1.0) as i32;
-    let half_thickness = (thickness_int / 2) as i32;
+    // Round thickness to nearest integer, ensuring minimum of 1 pixel
+    let thickness_int = (thickness.max(0.5).round()) as i32;
+    // Calculate half-thickness for symmetric drawing
+    // For thickness N, we draw from -half to +half, giving us 2*half+1 pixels
+    // To get approximately N pixels: half ≈ (N-1)/2
+    let half_thickness = ((thickness_int as f32 - 1.0) / 2.0).max(0.0).ceil() as i32;
 
     loop {
-        // Draw a circle/square of pixels for thickness
+        // Draw a square of pixels for thickness
         for dy_offset in -half_thickness..=half_thickness {
             for dx_offset in -half_thickness..=half_thickness {
                 let px = (x + dx_offset) as u32;
@@ -243,5 +248,39 @@ pub fn save_maze_with_solution(
     img.save(output_path)
         .map_err(|e| format!("Failed to save image: {}", e))?;
     Ok(())
+}
+
+/// Render a maze to PNG bytes
+pub fn render_maze_to_bytes(maze: &Maze, cell_size: u32) -> Result<Vec<u8>, String> {
+    let img = render_maze(maze, cell_size)?;
+    let dynamic_img = DynamicImage::ImageRgb8(img);
+    let mut bytes = Vec::new();
+    {
+        let mut cursor = Cursor::new(&mut bytes);
+        dynamic_img
+            .write_to(&mut cursor, image::ImageFormat::Png)
+            .map_err(|e| format!("Failed to encode image: {}", e))?;
+    }
+    Ok(bytes)
+}
+
+/// Render a maze with solution to PNG bytes
+pub fn render_maze_with_solution_to_bytes(
+    maze: &Maze,
+    cell_size: u32,
+    solution: &[(u32, u32)],
+    line_color: &str,
+    line_thickness: f32,
+) -> Result<Vec<u8>, String> {
+    let img = render_maze_with_solution(maze, cell_size, solution, line_color, line_thickness)?;
+    let dynamic_img = DynamicImage::ImageRgb8(img);
+    let mut bytes = Vec::new();
+    {
+        let mut cursor = Cursor::new(&mut bytes);
+        dynamic_img
+            .write_to(&mut cursor, image::ImageFormat::Png)
+            .map_err(|e| format!("Failed to encode image: {}", e))?;
+    }
+    Ok(bytes)
 }
 
